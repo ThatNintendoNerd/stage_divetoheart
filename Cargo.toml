@@ -1,6 +1,6 @@
 [package]
 name = "stage_divetoheart"
-version = "1.0.0"
+version = "2.0.0"
 authors = ["ThatNintendoNerd"]
 edition = "2021"
 

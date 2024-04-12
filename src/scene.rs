@@ -1,54 +1,85 @@
+use ninput::Controller;
 use serde::{Deserialize, Serialize};
-use smash_stage::stages::trail_castle;
+use smash_stage::app::stage::trail_castle;
 
-#[derive(Debug, Copy, Clone, PartialEq, Deserialize, Serialize)]
-#[repr(u8)]
+/// The stained-glass designs.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Serialize, Deserialize)]
 pub enum Scene {
+    /// A random stained-glass design.
+    #[default]
     Random,
+
+    /// Sora's stained-glass design.
     Sora,
+
+    /// Riku's stained-glass design.
     Riku,
+
+    /// Roxas's stained-glass design.
     Roxas,
+
+    /// Xion's stained-glass design.
     Xion,
+
+    /// Terra's stained-glass design.
     Terra,
+
+    /// Ventus's stained-glass design.
     Ventus,
+
+    /// Aqua's stained-glass design.
     Aqua,
 }
 
-impl Default for Scene {
-    fn default() -> Self {
+impl Scene {
+    /// Returns a stained-glass design variant depending on any one controller's held buttons.
+    pub fn from_any_controller() -> Self {
+        const NPAD_ID_HANDHELD: u32 = 0x20;
+        const NPAD_ID_MAX: u32 = 0x8;
+
+        if let Some(controller) = Controller::get_from_id(NPAD_ID_HANDHELD) {
+            let scene = Self::from(&controller);
+
+            if scene != Self::Random {
+                return scene;
+            }
+        }
+
+        for npad_id in 0..NPAD_ID_MAX {
+            if let Some(controller) = Controller::get_from_id(npad_id) {
+                let scene = Self::from(&controller);
+
+                if scene != Self::Random {
+                    return scene;
+                }
+            }
+        }
+
         Self::Random
     }
 }
 
-impl Into<trail_castle::Scene> for Scene {
-    fn into(self) -> trail_castle::Scene {
-        match self {
-            Self::Random => trail_castle::Scene::Common,
-            Self::Sora => trail_castle::Scene::Sora,
-            Self::Riku => trail_castle::Scene::Riku,
-            Self::Roxas => trail_castle::Scene::Roxas,
-            Self::Xion => trail_castle::Scene::Xion,
-            Self::Terra => trail_castle::Scene::Terra,
-            Self::Ventus => trail_castle::Scene::Ventus,
-            Self::Aqua => trail_castle::Scene::Aqua,
-        }
+impl From<&Controller> for Scene {
+    fn from(controller: &Controller) -> Self {
+        use crate::command::StageSelectSecretCommand;
+
+        let secret_command = StageSelectSecretCommand::from(controller);
+
+        secret_command.scene(controller.buttons)
     }
 }
 
-#[derive(Deserialize, Serialize)]
-pub struct Location(pub String);
-
-impl Location {
-    pub fn is_dth_default(&self) -> bool {
-        match self.0.as_str() {
-            "Dive to the Heart" => true,
-            _ => false
+impl From<Scene> for trail_castle::Scene {
+    fn from(scene: Scene) -> Self {
+        match scene {
+            Scene::Random => Self::Common,
+            Scene::Sora => Self::Sora,
+            Scene::Riku => Self::Riku,
+            Scene::Roxas => Self::Roxas,
+            Scene::Xion => Self::Xion,
+            Scene::Terra => Self::Terra,
+            Scene::Ventus => Self::Ventus,
+            Scene::Aqua => Self::Aqua,
         }
-    }
-}
-
-impl Default for Location {
-    fn default() -> Self {
-        Self("Hollow Bastion".to_string())
     }
 }

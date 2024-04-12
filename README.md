@@ -1,41 +1,56 @@
 # stage_divetoheart
 
-A [Skyline](https://github.com/skyline-dev/skyline) plugin for Super Smash Bros. Ultimate that patches code and data referenced by the Hollow Bastion stage to allow for configuring the behavior of Dive to the Heart. This plugin is meant to be used alongside this [stage mod](https://gamebanana.com/mods/393112).
+A [Skyline](https://github.com/skyline-dev/skyline) plugin for Super Smash Bros. Ultimate that patches code and data referenced by the Hollow Bastion stage to allow for configuring the behavior of Dive to the Heart. This plugin is meant to be used alongside [this](https://gamebanana.com/mods/393112) mod.
 
 The latest release can be found [here](https://github.com/ThatNintendoNerd/stage_divetoheart/releases/latest).
 
 ## Configuration
 
-When starting the game with this plugin installed, a new configuration file will be created at `sd:/ultimate/config_dth.toml` if it does not already exist. This file can be edited with any text editor.
+When launching the game with this plugin installed, a new configuration file will be created at `sd:/ultimate/stage_divetoheart/config.toml` if it does not already exist. This file can be edited with any text editor.
 
-Each table has a corresponding field for each form of the stage. The default values aim to represent as much of a vanilla experience as possible, so it is left up to the user to configure the values to their liking.
+Every table has keys for each form of the stage, where the keys are as follows:
+
+- `normal` corresponds to the normal form.
+- `battle` corresponds to the Battlefield form.
+- `end` corresponds to the Omega form.
+
+The default values aim to represent as close to a vanilla experience as possible, so it is left up to the user to configure them to their liking.
 
 ### Tables
 
 | Header | Description |
 | --- | --- |
-| `[hazards_off_override]` | Determines if Dive to the Heart can appear with hazards off. |
-| `[default_location]` | Determines whether the stage should start on `"Hollow Bastion"` or `"Dive to the Heart"`. The text encapsulated with an inline code block are the valid values that can be used. |
-| `[default_station]` | Determines the fallback station to default to if no station override button combination was used on the Stage Select screen. For a list of valid values, refer to the table's Station column in the [Station Override Button Combinations](#station-override-button-combinations) section. |
+| `[override_gimmick_off]` | Determines if Dive to the Heart can appear with stage hazards disabled. |
+| `[override_gimmick_on]` | Determines if Dive to the Heart cannot appear with stage hazards enabled. |
+| `[default_location]` | Determines the starting location of the stage.<br>For a list of valid values, refer to the Location column in the [Locations](#locations) section's table. |
+| `[default_scene]` | Determines the fallback stained-glass design.<br>The given stained-glass design is used when an invalid selection command or none at all is held when selecting the stage on the Stage Select screen.<br>For a list of valid values, refer to the Stained Glass column in the [Stained-Glass Design Selection Commands](#stained-glass-design-selection-commands) section's table. |
 
-### Station Override Button Combinations
+### Locations
 
-To override the station listed in the configuration file with a user's choice, hold the corresponding controller button combination and select Hollow Bastion on the Stage Select screen.
+| Location | Description |
+| --- | --- |
+| `Hollow Bastion` | Starts the stage on Hollow Bastion. |
+| `Dive to the Heart` | Starts the stage on Dive to the Heart. |
+| `Random` | Decides a random starting location between Hollow Bastion and Dive to the Heart. |
 
-| Station | Override Combination |
+### Stained-Glass Design Selection Commands
+
+To override the stained-glass design listed in the configuration file with a user's choice, hold the corresponding selection command and select Hollow Bastion on the Stage Select screen. The listed directions refer to those on the control stick or D-pad.
+
+| Stained Glass | Selection Command |
 | --- | --- |
 | `Random` | None |
 | `Sora` | L |
-| `Riku` | L & D-Pad Up |
-| `Roxas` | L & D-Pad Left |
-| `Xion` | L & D-Pad Down |
-| `Terra` | R & D-Pad Up |
-| `Ventus` | R & D-Pad Right |
-| `Aqua` | R & D-Pad Down |
+| `Riku` | L + Up |
+| `Roxas` | L + Left |
+| `Xion` | L + Down |
+| `Terra` | L + R + Up |
+| `Ventus` | L + R + Right |
+| `Aqua` | L + R + Down |
 
 ## Building
 
-NOTE: This project cannot be compiled without the smash_stage library. Said library is unreleased due to its incomplete state, but its release is planned for the future.
+NOTE: This project cannot be compiled without the smash_stage library. Said library is unreleased due to its incomplete state, but its release is planned.
 
 With an up-to-date version of the Rust toolchain installed and [cargo-skyline](https://github.com/jam1garner/cargo-skyline) 3.0.0 or newer, run the following command to compile the project in release mode:
 

@@ -1,105 +1,124 @@
-use std::fs::{self, File};
-use std::io::{self, Write};
-use std::path::Path;
+use std::{fs, path::Path};
 
 use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
 
-use crate::scene::{Location, Scene};
+use crate::{location::Location, scene::Scene};
 
-pub static CONFIG: Lazy<Config> = Lazy::new(|| {
-    let path = Path::new("sd:/ultimate/config_dth.toml");
-
-    if !path.is_file() {
-        let config = Config::new();
-
-        if config.save(path).is_err() {
-            println!("[stage_divetoheart::config] Failed to create configuration file '{}'. Using default settings...", path.display());
-
-            return config;
-        }
-    }
-
-    let config = fs::read_to_string(&path).ok().and_then(|string| toml::from_str(&string).ok());
-
-    if let Some(config) = config {
-        config
-    } else {
-        println!("[stage_divetoheart::config] Failed to parse TOML data from file '{}'. Using default settings...", path.display());
-
-        Config::new()
-    }
-});
-
-#[derive(Deserialize, Serialize)]
-pub struct HazardsOffOverride {
-    #[serde(default)]
-    pub normal: bool,
-
-    #[serde(default)]
-    pub battle: bool,
-
-    #[serde(default)]
-    pub end: bool,
-}
-
-#[derive(Deserialize, Serialize)]
-pub struct DefaultLocation {
-    #[serde(default)]
-    pub normal: Location,
-
-    #[serde(default)]
-    pub battle: Location,
-
-    #[serde(default)]
-    pub end: Location,
-}
-
-#[derive(Deserialize, Serialize)]
-pub struct DefaultStation {
-    #[serde(default)]
-    pub normal: Scene,
-
-    #[serde(default)]
-    pub battle: Scene,
-
-    #[serde(default)]
-    pub end: Scene,
-}
-
-#[derive(Deserialize, Serialize)]
+/// The container for deserializable plugin settings.
+#[derive(Default, Serialize, Deserialize)]
 pub struct Config {
-    pub hazards_off_override: HazardsOffOverride,
-    pub default_location: DefaultLocation,
-    pub default_station: DefaultStation,
+    /// Determines if Dive to the Heart can appear with stage hazards disabled.
+    pub override_gimmick_off: ConfigParameter<bool>,
+
+    /// Determines if Dive to the Heart cannot appear with stage hazards enabled.
+    pub override_gimmick_on: ConfigParameter<bool>,
+
+    /// Determines the starting location of the stage.
+    pub default_location: ConfigParameter<Location>,
+
+    /// Determines the fallback stained-glass design.
+    pub default_scene: ConfigParameter<Scene>,
 }
 
 impl Config {
-    pub fn new() -> Self {
-        Self {
-            hazards_off_override: HazardsOffOverride {
-                normal: false,
-                battle: false,
-                end: false,
+    /// Returns a reference to a `Lazy` containing the current instance of `Config`.
+    pub fn get() -> &'static Lazy<Self> {
+        static INSTANCE: Lazy<Config> = Lazy::new(|| {
+            let path = Path::new(Config::path());
+
+            if path.exists() {
+                return Config::read(path);
+            }
+
+            let parent = path.parent().unwrap();
+
+            if !parent.exists() {
+                fs::create_dir_all(parent).unwrap();
+            }
+
+            let config = Config::default();
+
+            config.write(path);
+
+            config
+        });
+
+        &INSTANCE
+    }
+
+    /// Reads and deserializes the configuration file from disk.
+    fn read<P: AsRef<Path>>(path: P) -> Self {
+        match fs::read_to_string(&path) {
+            Ok(string) => match toml::from_str(&string) {
+                Ok(config) => return config,
+                Err(error) => {
+                    eprintln!(
+                        "[{}] Failed to parse TOML file data from '{}': {}",
+                        module_path!(),
+                        path.as_ref().display(),
+                        error,
+                    );
+                }
             },
-            default_location: DefaultLocation {
-                normal: Location("Hollow Bastion".to_string()),
-                battle: Location("Hollow Bastion".to_string()),
-                end: Location("Hollow Bastion".to_string()),
-            },
-            default_station: DefaultStation {
-                normal: Scene::Random,
-                battle: Scene::Random,
-                end: Scene::Random,
-            },
+            Err(error) => {
+                eprintln!(
+                    "[{}] Failed to read TOML file data from '{}': {}",
+                    module_path!(),
+                    path.as_ref().display(),
+                    error,
+                );
+            }
+        }
+
+        Self::default()
+    }
+
+    /// Serializes and writes the current configuration to disk.
+    fn write<P: AsRef<Path>>(&self, path: P) {
+        match toml::to_string(self) {
+            Ok(toml) => {
+                if let Err(error) = fs::write(&path, toml) {
+                    eprintln!(
+                        "[{}] Failed to write TOML file data to '{}': {}",
+                        module_path!(),
+                        path.as_ref().display(),
+                        error,
+                    );
+                }
+            }
+            Err(error) => {
+                eprintln!(
+                    "[{}] Failed to serialize configuration: {}",
+                    module_path!(),
+                    error,
+                );
+            }
         }
     }
 
-    pub fn save(&self, path: &Path) -> Result<(), io::Error> {
-        let config = toml::to_vec(&self).unwrap_or_default();
-
-        File::create(&path)?.write_all(&config)?;
-
-        Ok(())
+    /// Returns the path to the configuration file.
+    fn path() -> &'static str {
+        "sd:/ultimate/stage_divetoheart/config.toml"
     }
+
+    /// Returns `true` if any one of the fields from `self.override_gimmick_off` are `true`.
+    pub fn is_override_gimmick_off(&self) -> bool {
+        self.override_gimmick_off.normal
+            || self.override_gimmick_off.battle
+            || self.override_gimmick_off.end
+    }
+}
+
+/// The field type for a `Config` containing settings for each form of the stage.
+#[derive(Default, Serialize, Deserialize)]
+pub struct ConfigParameter<T> {
+    /// The setting for the stage's normal form.
+    pub normal: T,
+
+    /// The setting for the stage's Battlefield form.
+    pub battle: T,
+
+    /// The setting for the stage's Omega form.
+    pub end: T,
 }

@@ -101,13 +101,6 @@ impl Config {
     fn path() -> &'static str {
         "sd:/ultimate/stage_divetoheart/config.toml"
     }
-
-    /// Returns `true` if any one of the fields from `self.override_gimmick_off` are `true`.
-    pub fn is_override_gimmick_off(&self) -> bool {
-        self.override_gimmick_off.normal
-            || self.override_gimmick_off.battle
-            || self.override_gimmick_off.end
-    }
 }
 
 /// The field type for a `Config` containing settings for each form of the stage.

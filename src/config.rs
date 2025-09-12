@@ -1,6 +1,5 @@
-use std::{fs, path::Path};
+use std::{fs, path::Path, sync::LazyLock};
 
-use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
 
 use crate::{location::Location, scene::Scene};
@@ -22,9 +21,9 @@ pub struct Config {
 }
 
 impl Config {
-    /// Returns a reference to a `Lazy` containing the current instance of `Config`.
-    pub fn get() -> &'static Lazy<Self> {
-        static INSTANCE: Lazy<Config> = Lazy::new(|| {
+    /// Returns a reference to a `LazyLock` containing the current instance of `Config`.
+    pub const fn get() -> &'static LazyLock<Self> {
+        static INSTANCE: LazyLock<Config> = LazyLock::new(|| {
             let path = Path::new(Config::path());
 
             if path.exists() {

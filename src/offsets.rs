@@ -1,4 +1,4 @@
-use once_cell::sync::Lazy;
+use std::sync::LazyLock;
 
 /// The container for cached offsets to code.
 pub struct Offsets {
@@ -52,9 +52,9 @@ impl Offsets {
         }
     }
 
-    /// Returns a reference to a `Lazy` containing the current instance of `Offsets`.
-    pub fn get() -> &'static Lazy<Self> {
-        static INSTANCE: Lazy<Offsets> = Lazy::new(Offsets::new);
+    /// Returns a reference to a `LazyLock` containing the current instance of `Offsets`.
+    pub const fn get() -> &'static LazyLock<Self> {
+        static INSTANCE: LazyLock<Offsets> = LazyLock::new(Offsets::new);
 
         &INSTANCE
     }

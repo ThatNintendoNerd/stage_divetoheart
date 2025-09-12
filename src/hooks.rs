@@ -7,7 +7,7 @@ use libc2::{
 };
 use skyline::hooks::InlineCtx;
 
-use crate::{controller::DiveToHeartController, offsets::Offsets, scene::Scene};
+use crate::{dth::DiveToHeartController, offsets::Offsets, scene::Scene};
 
 #[skyline::hook(offset = Offsets::get().trail_castle_set_random_settings, inline)]
 fn trail_castle_set_random_settings(ctx: &InlineCtx) {

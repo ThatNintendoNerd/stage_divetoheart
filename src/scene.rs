@@ -1,6 +1,6 @@
+use libc2::app::stage::trail_castle;
 use ninput::Controller;
 use serde::{Deserialize, Serialize};
-use smash_stage::app::stage::trail_castle;
 
 /// The stained-glass designs.
 #[derive(Debug, Clone, Copy, Default, PartialEq, Serialize, Deserialize)]

@@ -11,16 +11,16 @@ titleid = "01006A800016E000"
 crate-type = ["cdylib"]
 
 [dependencies]
-skyline = { git = "https://github.com/ultimate-research/skyline-rs.git" }
-smash_stage = { path = "../smash_stage" }
 hash40 = "1.3.1"
-memchr = "2.7.2"
+libc2 = { path = "../libc2" }
+memchr = "2.7.5"
 ninput = { git = "https://github.com/blu-dev/ninput.git" }
-once_cell = "1.19.0"
-parking_lot = "0.12.1"
-semver = "1.0"
-serde = { version = "1.0", features = ["derive"] }
-toml = "0.8.12"
+once_cell = "1.21.3"
+parking_lot = "0.12.4"
+semver = "1.0.26"
+serde = { version = "1.0.219", features = ["derive"] }
+skyline = { git = "https://github.com/ultimate-research/skyline-rs.git" }
+toml = "0.9.5"
 
 [profile.dev]
 panic = "abort"

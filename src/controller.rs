@@ -1,8 +1,8 @@
-use parking_lot::Mutex;
-use smash_stage::app::{
+use libc2::app::{
     stage::trail_castle::{StageData, StageDataVisual},
     GlobalParameter, GlobalStageParameter,
 };
+use parking_lot::Mutex;
 
 use crate::{config::Config, location::Location, scene::Scene};
 
@@ -51,7 +51,7 @@ impl DiveToHeartController {
 
     /// Updates the state of `self` based on the current game state.
     fn update_state(&mut self, stage_parameter: &mut GlobalStageParameter) {
-        use smash_stage::app::StageID;
+        use libc2::app::StageID;
 
         let config = Config::get();
 
@@ -149,7 +149,7 @@ impl DiveToHeartController {
 
     /// Returns the starting location of the stage.
     fn location(&self, default_location: Location) -> Location {
-        use smash_stage::app::StageRandom;
+        use libc2::app::StageRandom;
 
         if default_location != Location::Random {
             return default_location;
@@ -179,7 +179,7 @@ impl DiveToHeartController {
 
     /// Returns `true` if the stage is being played on in a mode unsupported by this plugin.
     pub fn is_invalid_melee_mode() -> bool {
-        use smash_stage::app::MeleeMode;
+        use libc2::app::MeleeMode;
 
         matches!(
             GlobalParameter::global_melee_parameter().melee_mode(),

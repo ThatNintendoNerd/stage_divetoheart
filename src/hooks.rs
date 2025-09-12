@@ -1,17 +1,17 @@
-use skyline::hooks::InlineCtx;
-use smash_stage::{
+use libc2::{
     app::{
         stage::trail_castle::{StageData, StageDataVisual},
         GlobalStageParameter, SecretCommandID,
     },
     lib::ParameterResource,
 };
+use skyline::hooks::InlineCtx;
 
 use crate::{controller::DiveToHeartController, offsets::Offsets, scene::Scene};
 
 #[skyline::hook(offset = Offsets::get().trail_castle_set_random_settings, inline)]
 fn trail_castle_set_random_settings(ctx: &InlineCtx) {
-    let seed = unsafe { *ctx.registers[20].w.as_ref() };
+    let seed = ctx.registers[20].w();
 
     DiveToHeartController::get().lock().set_seed(seed);
 }
@@ -30,9 +30,9 @@ fn trail_castle_resource_preload(arg1: usize, stage_parameter: &mut GlobalStageP
 #[skyline::hook(offset = Offsets::get().trail_castle_climax_rule_check, inline)]
 fn trail_castle_climax_rule_check(ctx: &InlineCtx) {
     if DiveToHeartController::get().lock().is_force_climax() {
-        unsafe {
-            let is_climax = *ctx.registers[23].x.as_ref() as *mut bool;
+        let is_climax = ctx.registers[23].x() as *mut bool;
 
+        unsafe {
             *is_climax = true;
         }
     }

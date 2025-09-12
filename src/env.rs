@@ -1,7 +1,10 @@
-use std::ffi::CStr;
+use std::{ffi::CStr, slice};
 
 use semver::Version;
-use skyline::nn;
+use skyline::{
+    hooks::{getRegionAddress, Region},
+    nn,
+};
 
 /// Determines if the version of the target application is supported.
 pub fn is_app_version_compatible() -> bool {
@@ -25,4 +28,12 @@ pub fn app_version() -> Version {
         .expect("version text should contain valid UTF-8");
 
     Version::parse(text).expect("application version should use semantic versioning")
+}
+
+/// Returns a byte slice representing the code segment of the target application.
+pub unsafe fn text() -> &'static [u8] {
+    let ptr = getRegionAddress(Region::Text).cast::<u8>();
+    let len = (getRegionAddress(Region::Rodata) as usize) - (ptr as usize);
+
+    slice::from_raw_parts(ptr, len)
 }

@@ -3,8 +3,13 @@ use std::ffi::CStr;
 use semver::Version;
 use skyline::nn;
 
-/// The minimum supported version of the target application.
-pub const APP_VERSION_MIN: Version = Version::new(13, 0, 0);
+/// Determines if the version of the target application is supported.
+pub fn is_app_version_compatible() -> bool {
+    let app_version = app_version();
+    let app_version_min = Version::new(13, 0, 0);
+
+    app_version >= app_version_min
+}
 
 /// Returns the version of the target application.
 pub fn app_version() -> Version {

@@ -14,7 +14,8 @@ fn main() {
     use config::Config;
     use offsets::Offsets;
 
-    if env::app_version() < env::APP_VERSION_MIN {
+    if !env::is_app_version_compatible() {
+        println!("stage_divetoheart is not compatible with the installed version of this software.");
         return;
     }
 

@@ -14,7 +14,7 @@ pub struct DiveToHeartController {
     /// Determines if the stage should start on Dive to the Heart.
     is_force_climax: bool,
 
-    /// Determines if the current melee mode is Training.
+    /// Determines if the current game mode is Training.
     is_training_mode: bool,
 
     /// The working stained-glass design.
@@ -25,7 +25,7 @@ pub struct DiveToHeartController {
 }
 
 impl DiveToHeartController {
-    /// Constructs a new instance of `DiveToHeartController`.
+    /// Creates a new `DiveToHeartController`.
     const fn new() -> Self {
         Self {
             is_climax: false,
@@ -36,8 +36,8 @@ impl DiveToHeartController {
         }
     }
 
-    /// Returns a reference to a `Mutex` containing the current instance of `DiveToHeartController`.
-    pub fn get() -> &'static Mutex<Self> {
+    /// Returns a reference to the mutually exclusive `DiveToHeartController`.
+    pub const fn get() -> &'static Mutex<Self> {
         static INSTANCE: Mutex<DiveToHeartController> = Mutex::new(DiveToHeartController::new());
 
         &INSTANCE
@@ -117,15 +117,17 @@ impl DiveToHeartController {
             return;
         }
 
-        if self.is_training_mode {
-            stage_parameter
-                .additional_settings
-                .trail_castle
-                .is_post_climax = true;
+        if !self.is_training_mode {
+            return;
         }
+
+        stage_parameter
+            .additional_settings
+            .trail_castle
+            .is_post_climax = true;
     }
 
-    /// Returns `true` if the stage should enable Dive to the Heart based on the given arguments.
+    /// Returns `true` if it is logical for the stage to enable Dive to the Heart.
     fn is_valid_climax(
         is_gimmick: bool,
         override_gimmick_off: bool,
@@ -138,7 +140,7 @@ impl DiveToHeartController {
         }
     }
 
-    /// Returns `true` if the stage should start on Dive to the Heart based on the given arguments.
+    /// Returns `true` if it is logical for the stage to start on Dive to the Heart.
     fn is_valid_force_climax(&self, default_location: Location) -> bool {
         if !self.is_climax {
             return false;
@@ -177,7 +179,7 @@ impl DiveToHeartController {
         self.seed = seed;
     }
 
-    /// Returns `true` if the stage is being played on in a mode unsupported by this plugin.
+    /// Returns `true` if the stage was selected in an unsupported game mode.
     pub fn is_invalid_melee_mode() -> bool {
         use libc2::app::MeleeMode;
 
@@ -195,17 +197,17 @@ impl DiveToHeartController {
         self.is_force_climax = Default::default();
     }
 
-    /// Returns `true` if values in both the `StageData` and `StageDataVisual` instances should be overwritten.
+    /// Returns `true` if values in the stage's specialized parameters should be overwritten accordingly.
     pub fn is_patch_stage_data(&self) -> bool {
         self.is_force_climax && !self.is_training_mode
     }
 
-    /// Overwrites values in the given instance of `StageData` to start the stage on Dive to the Heart.
+    /// Overwrites values in the given `StageData` to start the stage on Dive to the Heart.
     pub fn patch_stage_data(stage_data: &mut StageData) {
         stage_data.root.climax_delay_seconds = 0.0;
     }
 
-    /// Overwrites values in the given instance of `StageDataVisual` to start the stage on Dive to the Heart.
+    /// Overwrites values in the given `StageDataVisual` to start the stage on Dive to the Heart.
     pub fn patch_stage_data_visual(stage_data_visual: &mut StageDataVisual) {
         use hash40::Hash40;
 

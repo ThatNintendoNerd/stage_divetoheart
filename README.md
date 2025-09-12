@@ -1,18 +1,18 @@
 # stage_divetoheart
 
-A [Skyline](https://github.com/skyline-dev/skyline) plugin for Super Smash Bros. Ultimate that patches code and data referenced by the Hollow Bastion stage to allow for configuring the behavior of Dive to the Heart. This plugin is meant to be used alongside [this](https://gamebanana.com/mods/393112) mod.
+A [Skyline](https://github.com/skyline-dev/skyline) plugin for Super Smash Bros. Ultimate that patches code and data referenced by the Hollow Bastion stage to allow for configuring the behavior of Dive to the Heart. This plugin is meant to be used alongside the [Dive to the Heart Configurator](https://gamebanana.com/mods/393112) mod.
 
-The latest release can be found [here](https://github.com/ThatNintendoNerd/stage_divetoheart/releases/latest).
+The latest version is available from the [Releases](https://github.com/ThatNintendoNerd/stage_divetoheart/releases/latest) page.
 
 ## Configuration
 
-When launching the game with this plugin installed, a new configuration file will be created at `sd:/ultimate/stage_divetoheart/config.toml` if it does not already exist. This file can be edited with any text editor.
+When launching the game with the plugin installed, a new configuration file will be created at `sd:/ultimate/stage_divetoheart/config.toml` if it does not already exist. This file can be edited with any text editor.
 
-Every table has keys for each form of the stage, where the keys are as follows:
+Each table contains key-value pairs for each form of the stage, where the keys are as follows:
 
 - `normal` corresponds to the normal form.
 - `battle` corresponds to the Battlefield form.
-- `end` corresponds to the Omega form.
+- `end` corresponds to the Ω form.
 
 The default values aim to represent as close to a vanilla experience as possible, so it is left up to the user to configure them to their liking.
 
@@ -20,10 +20,10 @@ The default values aim to represent as close to a vanilla experience as possible
 
 | Header | Description |
 | --- | --- |
-| `[override_gimmick_off]` | Determines if Dive to the Heart can appear with stage hazards disabled. |
-| `[override_gimmick_on]` | Determines if Dive to the Heart cannot appear with stage hazards enabled. |
-| `[default_location]` | Determines the starting location of the stage.<br>For a list of valid values, refer to the Location column in the [Locations](#locations) section's table. |
-| `[default_scene]` | Determines the fallback stained-glass design.<br>The given stained-glass design is used when an invalid selection command or none at all is held when selecting the stage on the Stage Select screen.<br>For a list of valid values, refer to the Stained Glass column in the [Stained-Glass Design Selection Commands](#stained-glass-design-selection-commands) section's table. |
+| `[override_gimmick_off]` | Determines if Dive to the Heart should appear with stage hazards disabled. |
+| `[override_gimmick_on]` | Determines if Dive to the Heart should not appear with stage hazards enabled. |
+| `[default_location]` | <p>The starting location of the stage.</p><p>For a list of valid values, refer to the Location column in the [Locations](#locations) section's table.</p> |
+| `[default_scene]` | <p>The fallback stained-glass design.</p><p>The specified stained-glass design is considered when either an invalid or no selection command is held when selecting the stage on the Stage Select screen.</p><p>For a list of valid values, refer to the Stained Glass column in the [Stained-Glass Design Selection Commands](#stained-glass-design-selection-commands) section's table.</p> |
 
 ### Locations
 
@@ -35,18 +35,24 @@ The default values aim to represent as close to a vanilla experience as possible
 
 ### Stained-Glass Design Selection Commands
 
-To override the stained-glass design listed in the configuration file with a user's choice, hold the corresponding selection command and select Hollow Bastion on the Stage Select screen. The listed directions refer to those on the control stick or D-pad.
+To override the stained-glass design listed in the configuration file with a user's choice, hold the corresponding selection command and select Hollow Bastion on the Stage Select screen.
 
 | Stained Glass | Selection Command |
 | --- | --- |
 | `Random` | None |
 | `Sora` | L |
-| `Riku` | L + Up |
-| `Roxas` | L + Left |
-| `Xion` | L + Down |
-| `Terra` | L + R + Up |
-| `Ventus` | L + R + Right |
-| `Aqua` | L + R + Down |
+| `Riku` | L + ↑ |
+| `Roxas` | L + ← |
+| `Xion` | L + ↓ |
+| `Terra` | L + R + ↑ |
+| `Ventus` | L + R + → |
+| `Aqua` | L + R + ↓ |
+
+The listed directions refer to those on:
+
+- The Left Stick or +Control Pad for dual Joy-Con, Nintendo Switch Pro Controller, etc.
+- The Control Stick for sideways Joy-Con.
+- The Control Stick for the Nintendo GameCube Controller.
 
 ## Building
 

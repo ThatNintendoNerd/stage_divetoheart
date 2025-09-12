@@ -4,44 +4,50 @@ use serde::{Deserialize, Serialize};
 
 use crate::{location::Location, scene::Scene};
 
-/// The container for deserializable plugin settings.
+/// The container for persistent plugin settings.
 #[derive(Default, Serialize, Deserialize)]
 pub struct Config {
-    /// Determines if Dive to the Heart can appear with stage hazards disabled.
+    /// Determines if Dive to the Heart should appear with stage hazards disabled.
     pub override_gimmick_off: ConfigParameter<bool>,
 
-    /// Determines if Dive to the Heart cannot appear with stage hazards enabled.
+    /// Determines if Dive to the Heart should not appear with stage hazards enabled.
     pub override_gimmick_on: ConfigParameter<bool>,
 
-    /// Determines the starting location of the stage.
+    /// The starting location of the stage.
     pub default_location: ConfigParameter<Location>,
 
-    /// Determines the fallback stained-glass design.
+    /// The fallback stained-glass design.
     pub default_scene: ConfigParameter<Scene>,
 }
 
 impl Config {
-    /// Returns a reference to a `LazyLock` containing the current instance of `Config`.
+    /// The path to the configuration file.
+    const PATH: &str = "sd:/ultimate/stage_divetoheart/config.toml";
+
+    /// Creates a new `Config`.
+    fn new() -> Self {
+        let path = Path::new(Self::PATH);
+
+        if path.exists() {
+            return Self::read(path);
+        }
+
+        let parent = path.parent().unwrap();
+
+        if !parent.exists() {
+            fs::create_dir_all(parent).unwrap();
+        }
+
+        let config = Self::default();
+
+        config.write(path);
+
+        config
+    }
+
+    /// Returns a reference to the lazily initialized `Config`.
     pub const fn get() -> &'static LazyLock<Self> {
-        static INSTANCE: LazyLock<Config> = LazyLock::new(|| {
-            let path = Path::new(Config::path());
-
-            if path.exists() {
-                return Config::read(path);
-            }
-
-            let parent = path.parent().unwrap();
-
-            if !parent.exists() {
-                fs::create_dir_all(parent).unwrap();
-            }
-
-            let config = Config::default();
-
-            config.write(path);
-
-            config
-        });
+        static INSTANCE: LazyLock<Config> = LazyLock::new(Config::new);
 
         &INSTANCE
     }
@@ -53,19 +59,17 @@ impl Config {
                 Ok(config) => return config,
                 Err(error) => {
                     eprintln!(
-                        "[{}] Failed to parse TOML file data from '{}': {}",
+                        "[{}] Failed to parse TOML file data from '{}': {error}",
                         module_path!(),
                         path.as_ref().display(),
-                        error,
                     );
                 }
             },
             Err(error) => {
                 eprintln!(
-                    "[{}] Failed to read TOML file data from '{}': {}",
+                    "[{}] Failed to read TOML file data from '{}': {error}",
                     module_path!(),
                     path.as_ref().display(),
-                    error,
                 );
             }
         }
@@ -76,41 +80,35 @@ impl Config {
     /// Serializes and writes the current configuration to disk.
     fn write<P: AsRef<Path>>(&self, path: P) {
         match toml::to_string(self) {
-            Ok(toml) => {
-                if let Err(error) = fs::write(&path, toml) {
+            Ok(toml) => match fs::write(&path, toml) {
+                Ok(_) => {}
+                Err(error) => {
                     eprintln!(
-                        "[{}] Failed to write TOML file data to '{}': {}",
+                        "[{}] Failed to write TOML file data to '{}': {error}",
                         module_path!(),
                         path.as_ref().display(),
-                        error,
                     );
                 }
-            }
+            },
             Err(error) => {
                 eprintln!(
-                    "[{}] Failed to serialize configuration: {}",
+                    "[{}] Failed to serialize configuration: {error}",
                     module_path!(),
-                    error,
                 );
             }
         }
     }
-
-    /// Returns the path to the configuration file.
-    fn path() -> &'static str {
-        "sd:/ultimate/stage_divetoheart/config.toml"
-    }
 }
 
-/// The field type for a `Config` containing settings for each form of the stage.
+/// A table for a [`Config`] containing fields for each form of the stage.
 #[derive(Default, Serialize, Deserialize)]
 pub struct ConfigParameter<T> {
-    /// The setting for the stage's normal form.
+    /// The field for the stage's normal form.
     pub normal: T,
 
-    /// The setting for the stage's Battlefield form.
+    /// The field for the stage's Battlefield form.
     pub battle: T,
 
-    /// The setting for the stage's Omega form.
+    /// The field for the stage's Ω form.
     pub end: T,
 }

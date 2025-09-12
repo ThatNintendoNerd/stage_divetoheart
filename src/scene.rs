@@ -2,37 +2,37 @@ use libc2::app::stage::trail_castle;
 use ninput::Controller;
 use serde::{Deserialize, Serialize};
 
-/// The stained-glass designs.
+/// A stained-glass design.
 #[derive(Debug, Clone, Copy, Default, PartialEq, Serialize, Deserialize)]
 pub enum Scene {
     /// A random stained-glass design.
     #[default]
     Random,
 
-    /// Sora's stained-glass design.
+    /// The stained-glass design for Sora.
     Sora,
 
-    /// Riku's stained-glass design.
+    /// The stained-glass design for Riku.
     Riku,
 
-    /// Roxas's stained-glass design.
+    /// The stained-glass design for Roxas.
     Roxas,
 
-    /// Xion's stained-glass design.
+    /// The stained-glass design for Xion.
     Xion,
 
-    /// Terra's stained-glass design.
+    /// The stained-glass design for Terra.
     Terra,
 
-    /// Ventus's stained-glass design.
+    /// The stained-glass design for Ventus.
     Ventus,
 
-    /// Aqua's stained-glass design.
+    /// The stained-glass design for Aqua.
     Aqua,
 }
 
 impl Scene {
-    /// Returns a stained-glass design variant depending on any one controller's held buttons.
+    /// Returns a stained-glass design based on any one controller's held buttons.
     pub fn from_any_controller() -> Self {
         const NPAD_ID_HANDHELD: u32 = 0x20;
         const NPAD_ID_MAX: u32 = 0x8;

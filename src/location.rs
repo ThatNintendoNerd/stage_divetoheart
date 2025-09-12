@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-/// The starting locations.
+/// A starting location.
 #[derive(Debug, Clone, Copy, Default, PartialEq, Serialize, Deserialize)]
 pub enum Location {
     /// Hollow Bastion.

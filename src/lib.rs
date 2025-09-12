@@ -11,8 +11,9 @@ mod scene;
 #[skyline::main(name = "stage_divetoheart")]
 fn main() {
     if !env::is_app_version_compatible() {
-        println!(
-            "stage_divetoheart is not compatible with the installed version of this software."
+        eprintln!(
+            "[{}] The installed version of the target software is not compatible.",
+            module_path!(),
         );
         return;
     }

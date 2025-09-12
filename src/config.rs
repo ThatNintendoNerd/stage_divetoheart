@@ -59,17 +59,15 @@ impl Config {
                 Ok(config) => return config,
                 Err(error) => {
                     eprintln!(
-                        "[{}] Failed to parse TOML file data from '{}': {error}",
+                        "[{}] Failed to deserialize configuration file: {error}",
                         module_path!(),
-                        path.as_ref().display(),
                     );
                 }
             },
             Err(error) => {
                 eprintln!(
-                    "[{}] Failed to read TOML file data from '{}': {error}",
+                    "[{}] Failed to read configuration file: {error}",
                     module_path!(),
-                    path.as_ref().display(),
                 );
             }
         }
@@ -84,9 +82,8 @@ impl Config {
                 Ok(_) => {}
                 Err(error) => {
                     eprintln!(
-                        "[{}] Failed to write TOML file data to '{}': {error}",
+                        "[{}] Failed to write configuration file: {error}",
                         module_path!(),
-                        path.as_ref().display(),
                     );
                 }
             },

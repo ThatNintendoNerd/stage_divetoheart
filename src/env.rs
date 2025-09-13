@@ -27,7 +27,7 @@ pub fn app_version() -> Version {
         .to_str()
         .expect("version text should contain valid UTF-8");
 
-    Version::parse(text).expect("software version should use semantic versioning")
+    Version::parse(text).expect("target software version should use semantic versioning")
 }
 
 /// Returns a byte slice representing the code segment of the target application.

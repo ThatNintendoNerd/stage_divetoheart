@@ -27,8 +27,8 @@ fn main() {
                 None => "Box<Any>",
             },
         };
-        let message = "stage_divetoheart has panicked! Please open Details and post an issue at https://github.com/ThatNintendoNerd/stage_divetoheart.\0";
-        let details = format!("thread panicked at {location}:\n{payload}\0");
+        let message = "stage_divetoheart has panicked! Please select Details and create an issue at https://github.com/ThatNintendoNerd/stage_divetoheart";
+        let details = format!("thread panicked at {location}:\n{payload}");
 
         skyline::error::show_error(69, message, details.as_str());
     }));

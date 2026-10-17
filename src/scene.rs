@@ -2,6 +2,8 @@ use libc2::app::stage::trail_castle;
 use ninput::Controller;
 use serde::{Deserialize, Serialize};
 
+use crate::command::StageSelectSecretCommand;
+
 /// A stained-glass design.
 #[derive(Debug, Clone, Copy, Default, PartialEq, Serialize, Deserialize)]
 pub enum Scene {
@@ -61,8 +63,6 @@ impl Scene {
 
 impl From<&Controller> for Scene {
     fn from(controller: &Controller) -> Self {
-        use crate::command::StageSelectSecretCommand;
-
         let secret_command = StageSelectSecretCommand::from(controller);
 
         secret_command.scene(controller.buttons)
@@ -72,7 +72,7 @@ impl From<&Controller> for Scene {
 impl From<Scene> for trail_castle::Scene {
     fn from(scene: Scene) -> Self {
         match scene {
-            Scene::Random => Self::Common,
+            Scene::Random => Self::Random,
             Scene::Sora => Self::Sora,
             Scene::Riku => Self::Riku,
             Scene::Roxas => Self::Roxas,

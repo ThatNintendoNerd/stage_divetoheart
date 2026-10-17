@@ -1,6 +1,9 @@
-use libc2::app::{
-    stage::trail_castle::{StageData, StageDataVisual},
-    GlobalParameter, GlobalStageParameter,
+use libc2::{
+    app::{
+        GlobalParameter, GlobalStageParameter, MeleeMode, StageID, StageRandom,
+        stage::trail_castle::{StageData, StageDataVisual},
+    },
+    phx::Hash40,
 };
 use parking_lot::Mutex;
 
@@ -51,8 +54,6 @@ impl DiveToHeartController {
 
     /// Updates the state of `self` based on the current game state.
     fn update_state(&mut self, stage_parameter: &mut GlobalStageParameter) {
-        use libc2::app::StageID;
-
         let config = Config::get();
 
         match stage_parameter.stage_id() {
@@ -110,7 +111,7 @@ impl DiveToHeartController {
         }
 
         if self.scene != Scene::Random {
-            stage_parameter.random_settings.trail_castle.scene = self.scene.into();
+            stage_parameter.setting.random.trail_castle.scene = self.scene.into();
         }
 
         if !self.is_force_climax {
@@ -121,10 +122,7 @@ impl DiveToHeartController {
             return;
         }
 
-        stage_parameter
-            .additional_settings
-            .trail_castle
-            .is_post_climax = true;
+        stage_parameter.setting.ex.trail_castle.is_dive_fix = true;
     }
 
     /// Returns `true` if it is logical for the stage to enable Dive to the Heart.
@@ -151,8 +149,6 @@ impl DiveToHeartController {
 
     /// Returns the starting location of the stage.
     fn location(&self, default_location: Location) -> Location {
-        use libc2::app::StageRandom;
-
         if default_location != Location::Random {
             return default_location;
         }
@@ -181,8 +177,6 @@ impl DiveToHeartController {
 
     /// Returns `true` if the stage was selected in an unsupported game mode.
     pub fn is_invalid_melee_mode() -> bool {
-        use libc2::app::MeleeMode;
-
         matches!(
             GlobalParameter::global_melee_parameter().melee_mode(),
             MeleeMode::Standard
@@ -204,21 +198,19 @@ impl DiveToHeartController {
 
     /// Overwrites values in the given `StageData` to start the stage on Dive to the Heart.
     pub fn patch_stage_data(stage_data: &mut StageData) {
-        stage_data.root.climax_delay_seconds = 0.0;
+        stage_data.climax_delay_seconds = 0.0;
     }
 
     /// Overwrites values in the given `StageDataVisual` to start the stage on Dive to the Heart.
     pub fn patch_stage_data_visual(stage_data_visual: &mut StageDataVisual) {
-        use hash40::Hash40;
+        stage_data_visual.diving_period = 1.0;
+        stage_data_visual.fading_period = 0.0;
+        stage_data_visual.lightset_shift_period = 0.0;
+        stage_data_visual.smoke_fading_period = 0.0;
+        stage_data_visual.pipe_fading_delay = 0.0;
+        stage_data_visual.pipe_fading_period = 0.0;
 
-        stage_data_visual.root.diving_period = 1.0;
-        stage_data_visual.root.fading_period = 0.0;
-        stage_data_visual.root.x156c914b3c = 0.0;
-        stage_data_visual.root.smoke_fading_period = 0.0;
-        stage_data_visual.root.pipe_fading_delay = 0.0;
-        stage_data_visual.root.pipe_fading_period = 0.0;
-
-        for model in stage_data_visual.root.climax_visibility_settings.iter_mut() {
+        for model in &mut stage_data_visual.climax_visibility_settings {
             if model.start_frame == 43.0 {
                 model.start_frame = 0.0;
             } else if model.end_frame == 42.0 || model.end_frame == 100.0 {
@@ -227,7 +219,7 @@ impl DiveToHeartController {
             }
         }
 
-        for animation in stage_data_visual.root.climax_animation_settings.iter_mut() {
+        for animation in &mut stage_data_visual.climax_animation_settings {
             if animation.anime_name == Hash40::new("sky_dth") {
                 animation.anime_name = Hash40::new("sky_spirits");
                 break;

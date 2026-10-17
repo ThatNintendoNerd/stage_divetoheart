@@ -1,9 +1,9 @@
 use libc2::{
     app::{
-        stage::trail_castle::{StageData, StageDataVisual},
         GlobalStageParameter, SecretCommandID,
+        stage::trail_castle::{StageData, StageDataVisual},
     },
-    lib::ParameterResource,
+    phx::{Hash40, ParameterResource},
 };
 use skyline::hooks::InlineCtx;
 
@@ -61,8 +61,6 @@ fn trail_castle_stage_data_visual_read(
 
 #[skyline::hook(offset = Offsets::get().get_secret_command_id)]
 fn get_secret_command_id(ui_stage_db: usize, ui_stage_id: u64, is_joycon: bool) -> SecretCommandID {
-    use hash40::Hash40;
-
     if Hash40(ui_stage_id & 0xFFFFFFFFFF) == Hash40::new("ui_stage_trail_castle") {
         let scene = Scene::from_any_controller();
 

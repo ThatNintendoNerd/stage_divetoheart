@@ -29,11 +29,11 @@ fn trail_castle_resource_preload(arg1: usize, stage_parameter: &mut GlobalStageP
 
 #[skyline::hook(offset = Offsets::get().trail_castle_climax_rule_check, inline)]
 fn trail_castle_climax_rule_check(ctx: &InlineCtx) {
-    if DiveToHeartController::get().lock().is_force_climax() {
-        let is_climax = ctx.registers[23].x() as *mut bool;
+    if DiveToHeartController::get().lock().is_dive_fix() {
+        let is_dive = ctx.registers[23].x() as *mut bool;
 
         unsafe {
-            *is_climax = true;
+            *is_dive = true;
         }
     }
 }

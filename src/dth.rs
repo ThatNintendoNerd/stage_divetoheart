@@ -12,10 +12,10 @@ use crate::{config::Config, location::Location, scene::Scene};
 /// The controller for configuring the behavior of Dive to the Heart on the Hollow Bastion stage.
 pub struct DiveToHeartController {
     /// Determines if the stage should enable Dive to the Heart.
-    is_climax: bool,
+    is_dive: bool,
 
     /// Determines if the stage should start on Dive to the Heart.
-    is_force_climax: bool,
+    is_dive_fix: bool,
 
     /// Determines if the current game mode is Training.
     is_training_mode: bool,
@@ -31,8 +31,8 @@ impl DiveToHeartController {
     /// Creates a new `DiveToHeartController`.
     const fn new() -> Self {
         Self {
-            is_climax: false,
-            is_force_climax: false,
+            is_dive: false,
+            is_dive_fix: false,
             is_training_mode: false,
             scene: Scene::Random,
             seed: 0,
@@ -49,7 +49,7 @@ impl DiveToHeartController {
     /// Updates the state of both `self` and the stage's settings based on the current game state.
     pub fn update(&mut self, stage_parameter: &mut GlobalStageParameter) {
         self.update_state(stage_parameter);
-        self.update_stage_settings(stage_parameter);
+        self.update_stage_setting(stage_parameter);
     }
 
     /// Updates the state of `self` based on the current game state.
@@ -93,9 +93,8 @@ impl DiveToHeartController {
         default_location: Location,
         default_scene: Scene,
     ) {
-        self.is_climax =
-            Self::is_valid_climax(is_gimmick, override_gimmick_off, override_gimmick_on);
-        self.is_force_climax = self.is_valid_force_climax(default_location);
+        self.is_dive = Self::is_valid_dive(is_gimmick, override_gimmick_off, override_gimmick_on);
+        self.is_dive_fix = self.is_valid_dive_fix(default_location);
 
         if self.scene == Scene::Random {
             self.scene = default_scene;
@@ -103,10 +102,10 @@ impl DiveToHeartController {
     }
 
     /// Updates the state of the stage's settings based on the current game state.
-    fn update_stage_settings(&self, stage_parameter: &mut GlobalStageParameter) {
-        stage_parameter.is_gimmick = self.is_climax;
+    fn update_stage_setting(&self, stage_parameter: &mut GlobalStageParameter) {
+        stage_parameter.is_gimmick = self.is_dive;
 
-        if !self.is_climax {
+        if !self.is_dive {
             return;
         }
 
@@ -114,7 +113,7 @@ impl DiveToHeartController {
             stage_parameter.setting.random.trail_castle.scene = self.scene.into();
         }
 
-        if !self.is_force_climax {
+        if !self.is_dive_fix {
             return;
         }
 
@@ -126,7 +125,7 @@ impl DiveToHeartController {
     }
 
     /// Returns `true` if it is logical for the stage to enable Dive to the Heart.
-    fn is_valid_climax(
+    fn is_valid_dive(
         is_gimmick: bool,
         override_gimmick_off: bool,
         override_gimmick_on: bool,
@@ -139,8 +138,8 @@ impl DiveToHeartController {
     }
 
     /// Returns `true` if it is logical for the stage to start on Dive to the Heart.
-    fn is_valid_force_climax(&self, default_location: Location) -> bool {
-        if !self.is_climax {
+    fn is_valid_dive_fix(&self, default_location: Location) -> bool {
+        if !self.is_dive {
             return false;
         }
 
@@ -161,8 +160,8 @@ impl DiveToHeartController {
     }
 
     /// Returns `true` if the stage should start on Dive to the Heart.
-    pub fn is_force_climax(&self) -> bool {
-        self.is_force_climax
+    pub fn is_dive_fix(&self) -> bool {
+        self.is_dive_fix
     }
 
     /// Sets the working stained-glass design.
@@ -188,12 +187,12 @@ impl DiveToHeartController {
 
     /// Sets all variables that are read from within update loops to their respective default state.
     pub fn reset(&mut self) {
-        self.is_force_climax = Default::default();
+        self.is_dive_fix = Default::default();
     }
 
     /// Returns `true` if values in the stage's specialized parameters should be overwritten accordingly.
     pub fn is_patch_stage_data(&self) -> bool {
-        self.is_force_climax && !self.is_training_mode
+        self.is_dive_fix && !self.is_training_mode
     }
 
     /// Overwrites values in the given `StageData` to start the stage on Dive to the Heart.
